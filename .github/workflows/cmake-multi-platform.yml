@@ -19,14 +19,12 @@ jobs:
         build_type: [Release]
         serveronly: ["OFF", "ON"]
         include:
-          - os: windows-latest
           - os: ubuntu-latest
           - os: ubuntu-24.04-arm
         exclude:
-          - os: windows-latest
-            serveronly: "ON"
           - os: ubuntu-24.04-arm
             serveronly: "OFF"
+          - os: windows-latest
 
     steps:
     - uses: actions/checkout@v4
