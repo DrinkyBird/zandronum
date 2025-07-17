@@ -4,6 +4,9 @@ name: CMake on multiple platforms
 
 on: [push, pull_request]
 
+env:
+  FMOD_VER: 42416
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -50,12 +53,16 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Install dependencies
+    - name: Install dependencies for Linux
       shell: bash
       if: runner.os == 'Linux'
       run: |
         sudo apt update
         sudo apt install g++ make cmake libsdl1.2-dev mercurial zlib1g-dev libbz2-dev libjpeg-dev libfluidsynth-dev libgtk2.0-dev timidity nasm libgl1-mesa-dev libssl-dev tar libglew-dev wget libopus-dev
+        wget https://zandronum.com/essentials/fmod/fmodapi${FMOD_VER}linux64.tar.gz
+        tar xf fmodapi${FMOD_VER}linux64.tar.gz
+        echo "FMOD_INCLUDE_DIR=${PWD}/fmodapi${FMOD_VER}linux/api/inc" >> $GITHUB_ENV
+        echo "FMOD_LIBRARY=${PWD}/fmodapi${FMOD_VER}linux/api/lib/libfmodex64-4.44.64.so" >> $GITHUB_ENV
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
