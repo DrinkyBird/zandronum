@@ -50,6 +50,13 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Install dependencies
+      shell: bash
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt update
+        sudo apt install g++ make cmake libsdl1.2-dev mercurial zlib1g-dev libbz2-dev libjpeg-dev libfluidsynth-dev libgtk2.0-dev timidity nasm libgl1-mesa-dev libssl-dev tar libglew-dev wget libopus-dev
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
