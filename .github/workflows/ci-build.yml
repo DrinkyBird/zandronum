@@ -1,11 +1,10 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
-name: CMake on multiple platforms
+name: CI build
 
 on: [push, pull_request]
 
 env:
   FMOD_VER: 44464
+  FMOD_SOVER: 4.44.64
 
 jobs:
   build:
@@ -46,7 +45,7 @@ jobs:
           wget https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/fmodapi${FMOD_VER}linux.tar.gz
           tar xf fmodapi${FMOD_VER}linux.tar.gz
           echo "FMOD_INCLUDE_DIR=${PWD}/fmodapi${FMOD_VER}linux/api/inc" >> $GITHUB_ENV
-          echo "FMOD_LIBRARY=${PWD}/fmodapi${FMOD_VER}linux/api/lib/libfmodex64-4.44.64.so" >> $GITHUB_ENV
+          echo "FMOD_LIBRARY=${PWD}/fmodapi${FMOD_VER}linux/api/lib/libfmodex64-${FMOD_SOVER}.so" >> $GITHUB_ENV
         fi
 
     - name: Configure CMake
@@ -58,7 +57,7 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Create Package
+    - name: Create package
       shell: bash
       run: |
         mkdir package
