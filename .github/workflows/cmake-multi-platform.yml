@@ -62,3 +62,20 @@ jobs:
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Create Package
+      shell: bash
+      run: |
+        mkdir package
+        if [[ "${{ runner.os }}" == 'Linux' ]]; then
+          cp ${{ steps.strings.outputs.build-output-dir }}/zandronum* package
+          cp ${{ steps.strings.outputs.build-output-dir }}/*.pk3 package
+          cp ${{ steps.strings.outputs.build-output-dir }}/*.so package || true
+          cp ${FMOD_LIBRARY} package || true
+        fi
+
+    - name: Upload artefacts
+      uses: actions/upload-artifact@v4
+      with:
+        path: package
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
