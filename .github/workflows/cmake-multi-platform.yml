@@ -59,7 +59,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install g++ make cmake libsdl1.2-dev mercurial zlib1g-dev libbz2-dev libjpeg-dev libfluidsynth-dev libgtk2.0-dev timidity nasm libgl1-mesa-dev libssl-dev tar libglew-dev wget libopus-dev
-        wget https://zandronum.com/essentials/fmod/fmodapi${FMOD_VER}linux64.tar.gz
+        wget https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/fmodapi42416linux64.tar.gz
         tar xf fmodapi${FMOD_VER}linux64.tar.gz
         echo "FMOD_INCLUDE_DIR=${PWD}/fmodapi${FMOD_VER}linux/api/inc" >> $GITHUB_ENV
         echo "FMOD_LIBRARY=${PWD}/fmodapi${FMOD_VER}linux/api/lib/libfmodex64-4.44.64.so" >> $GITHUB_ENV
