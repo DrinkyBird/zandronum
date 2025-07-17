@@ -52,7 +52,7 @@ jobs:
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSERVERONLY=${{ matrix.serveronly }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSERVERONLY=${{ matrix.serveronly }} -DRELEASE_WITH_DEBUG_FILE=ON
         -S ${{ github.workspace }}
 
     - name: Build
