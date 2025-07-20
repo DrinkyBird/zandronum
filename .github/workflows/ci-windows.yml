@@ -14,18 +14,11 @@ jobs:
       fail-fast: false
 
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest]
+        os: [windows-latest]
         build_type: [Release]
-        serveronly: ["OFF", "ON"]
+        platform: ["Win32", "x64"]
         include:
           - os: windows-latest
-          - os: ubuntu-latest
-          - os: ubuntu-24.04-arm
-        exclude:
-          - os: ubuntu-24.04-arm
-            serveronly: "OFF"
-          - os: windows-latest
-            serveronly: "OFF"
 
     steps:
     - uses: actions/checkout@v4
@@ -44,24 +37,24 @@ jobs:
         Invoke-WebRequest -Outfile 'deps.zip' 'https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/zan-windows-deps.zip'
         Expand-Archive 'deps.zip' -DestinationPath 'deps'
         echo "DXSDK_DIR=${PWD}/deps/dxsdk" >> $env:GITHUB_ENV
-
-    - name: Install dependencies for Linux
-      shell: bash
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt update
-        sudo apt install g++ make cmake libsdl1.2-dev mercurial zlib1g-dev libbz2-dev libjpeg-dev libfluidsynth-dev libgtk2.0-dev timidity nasm libgl1-mesa-dev libssl-dev tar libglew-dev wget libopus-dev
-        if [[ "${{ matrix.serveronly }}" == "OFF" ]]; then
-          wget https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/fmodapi${FMOD_VER}linux.tar.gz
-          tar xf fmodapi${FMOD_VER}linux.tar.gz
-          echo "FMOD_INCLUDE_DIR=${PWD}/fmodapi${FMOD_VER}linux/api/inc" >> $GITHUB_ENV
-          echo "FMOD_LIBRARY=${PWD}/fmodapi${FMOD_VER}linux/api/lib/libfmodex64-${FMOD_SOVER}.so" >> $GITHUB_ENV
-        fi
+        echo "OPUS_INCLUDE_DIR=${PWD}/deps/opus/include" >> $env:GITHUB_ENV
+        echo "FMOD_INCLUDE_DIR=${PWD}/deps/fmodapi44464win/api/inc" >> $env:GITHUB_ENV
+        echo "NASM_PATH=${PWD}/deps/nasm/nasm.exe" >> $env:GITHUB_ENV
+        If ( '{{ matrix.platform }}' -eq 'x64' ) {
+            echo "OPUS_LIBRARY=${PWD}/deps/opus/lib64/opus.lib" >> $env:GITHUB_ENV
+            echo "FMOD_LIBRARY=${PWD}/deps/fmodapi44464win/api/lib/fmodex64_vc.lib" >> $env:GITHUB_ENV
+            echo "OPENSSL_ROOT_DIR=${PWD}/deps/openssl64" >> $env:GITHUB_ENV
+        }
+        Else {
+            echo "OPUS_LIBRARY=${PWD}/deps/opus/lib32/opus.lib" >> $env:GITHUB_ENV
+            echo "FMOD_LIBRARY=${PWD}/deps/fmodapi44464win/api/lib/fmodex_vc.lib" >> $env:GITHUB_ENV
+            echo "OPENSSL_ROOT_DIR=${PWD}/deps/openssl32" >> $env:GITHUB_ENV
+        }
 
     - name: Configure CMake
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSERVERONLY=${{ matrix.serveronly }} -DRELEASE_WITH_DEBUG_FILE=ON
+        cmake -B ${{ steps.strings.outputs.build-output-dir }} -A {{ matrix.platform }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
     - name: Build
