@@ -49,7 +49,7 @@ jobs:
 
     - name: Configure CMake
       run: >
-        if [[ "${{ matrix.serveronly }}" == "" ]]; then export SERVERONLY=ON; fi
+        if [[ "${{ matrix.serveronly }}" == "SERVERONLY" ]]; then export SERVERONLY=ON; fi
         
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSERVERONLY=${SERVERONLY} -DRELEASE_WITH_DEBUG_FILE=ON
