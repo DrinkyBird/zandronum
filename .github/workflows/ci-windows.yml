@@ -36,26 +36,46 @@ jobs:
       run: |
         Invoke-WebRequest -Outfile 'deps.zip' 'https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/zan-windows-deps.zip'
         Expand-Archive 'deps.zip' -DestinationPath 'deps'
-        echo "DXSDK_DIR=${PWD}/deps/dxsdk" >> $env:GITHUB_ENV
-        echo "OPUS_INCLUDE_DIR=${PWD}/deps/opus/include" >> $env:GITHUB_ENV
-        echo "FMOD_INCLUDE_DIR=${PWD}/deps/fmodapi44464win/api/inc" >> $env:GITHUB_ENV
-        echo "NASM_PATH=${PWD}/deps/nasm/nasm.exe" >> $env:GITHUB_ENV
-        If ( '{{ matrix.platform }}' -eq 'x64' ) {
-            echo "OPUS_LIBRARIES=${PWD}/deps/opus/lib64/opus.lib" >> $env:GITHUB_ENV
-            echo "FMOD_LIBRARY=${PWD}/deps/fmodapi44464win/api/lib/fmodex64_vc.lib" >> $env:GITHUB_ENV
-            echo "OPENSSL_ROOT_DIR=${PWD}/deps/openssl64" >> $env:GITHUB_ENV
-        }
-        Else {
-            echo "OPUS_LIBRARIES=${PWD}/deps/opus/lib32/opus.lib" >> $env:GITHUB_ENV
-            echo "FMOD_LIBRARY=${PWD}/deps/fmodapi44464win/api/lib/fmodex_vc.lib" >> $env:GITHUB_ENV
-            echo "OPENSSL_ROOT_DIR=${PWD}/deps/openssl32" >> $env:GITHUB_ENV
-        }
+        echo "DEPS_DIR=${PWD}/deps" >> $env:GITHUB_ENV
 
     - name: Configure CMake
+      shell: pwsh
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }} -A ${{ matrix.platform }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+        $bits = 32;
+        $sslArch = 'x86';
+        $fmodArch = '';
+        If ( '{{ matrix.platform }}' -eq 'x64' ) {
+            $bits = 64;
+            $sslArch = 'x64';
+            $fmodArch = '64';
+        }
+        
+        echo -DDXSDK_DIR="${env:DEPS_DIR}\deps\dxsdk" `
+            -DOPUS_INCLUDE_DIR="${env:DEPS_DIR}\opus\include" `
+            -DOPUS_LIBRARIES="${env:DEPS_DIR}\opus\lib${bits}\opus.lib" `
+            -DOPENSSL_INCLUDE_DIR="${env:DEPS_DIR}\openssl${bits}\include" `
+            -DLIB_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libcrypto_static.lib" `
+            -DLIB_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libcrypto_static.lib" `
+            -DSSL_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libssl_static.lib" `
+            -DSSL_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libssl_static.lib" `
+            -DFMOD_INCLUDE_DIR="${env:DEPS_DIR}\fmodapi44464win\api\inc" `
+            -DFMOD_LIBRARY="${env:DEPS_DIR}\fmodapi44464win\api\lib\fmodex${fmodArch}_vc.lib" `
+            -DNASM_PATH="${env:DEPS_DIR}\deps\nasm\nasm.exe"
+        
+        & cmake -B "${{ steps.strings.outputs.build-output-dir }}" -S "${{ github.workspace }}" `
+            -A "${{ matrix.platform }}" `
+            -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}" `
+            -DDXSDK_DIR="${env:DEPS_DIR}\deps\dxsdk" `
+            -DOPUS_INCLUDE_DIR="${env:DEPS_DIR}\opus\include" `
+            -DOPUS_LIBRARIES="${env:DEPS_DIR}\opus\lib${bits}\opus.lib" `
+            -DOPENSSL_INCLUDE_DIR="${env:DEPS_DIR}\openssl${bits}\include" `
+            -DLIB_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libcrypto_static.lib" `
+            -DLIB_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libcrypto_static.lib" `
+            -DSSL_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libssl_static.lib" `
+            -DSSL_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libssl_static.lib" `
+            -DFMOD_INCLUDE_DIR="${env:DEPS_DIR}\fmodapi44464win\api\inc" `
+            -DFMOD_LIBRARY="${env:DEPS_DIR}\fmodapi44464win\api\lib\fmodex${fmodArch}_vc.lib" `
+            -DNASM_PATH="${env:DEPS_DIR}\deps\nasm\nasm.exe"
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
