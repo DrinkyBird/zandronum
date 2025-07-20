@@ -41,19 +41,19 @@ jobs:
         echo "FMOD_INCLUDE_DIR=${PWD}/deps/fmodapi44464win/api/inc" >> $env:GITHUB_ENV
         echo "NASM_PATH=${PWD}/deps/nasm/nasm.exe" >> $env:GITHUB_ENV
         If ( '{{ matrix.platform }}' -eq 'x64' ) {
-            echo "OPUS_LIBRARY=${PWD}/deps/opus/lib64/opus.lib" >> $env:GITHUB_ENV
+            echo "OPUS_LIBRARIES=${PWD}/deps/opus/lib64/opus.lib" >> $env:GITHUB_ENV
             echo "FMOD_LIBRARY=${PWD}/deps/fmodapi44464win/api/lib/fmodex64_vc.lib" >> $env:GITHUB_ENV
             echo "OPENSSL_ROOT_DIR=${PWD}/deps/openssl64" >> $env:GITHUB_ENV
         }
         Else {
-            echo "OPUS_LIBRARY=${PWD}/deps/opus/lib32/opus.lib" >> $env:GITHUB_ENV
+            echo "OPUS_LIBRARIES=${PWD}/deps/opus/lib32/opus.lib" >> $env:GITHUB_ENV
             echo "FMOD_LIBRARY=${PWD}/deps/fmodapi44464win/api/lib/fmodex_vc.lib" >> $env:GITHUB_ENV
             echo "OPENSSL_ROOT_DIR=${PWD}/deps/openssl32" >> $env:GITHUB_ENV
         }
 
     - name: Configure CMake
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }} -A {{ matrix.platform }}
+        cmake -B ${{ steps.strings.outputs.build-output-dir }} -A ${{ matrix.platform }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
@@ -64,15 +64,12 @@ jobs:
       shell: bash
       run: |
         mkdir package
-        if [[ "${{ runner.os }}" == 'Linux' ]]; then
-          cp ${{ steps.strings.outputs.build-output-dir }}/zandronum* package
-          cp ${{ steps.strings.outputs.build-output-dir }}/*.pk3 package
-          cp ${{ steps.strings.outputs.build-output-dir }}/*.so package || true
-          cp ${FMOD_LIBRARY} package || true
-        fi
+        cp ${{ steps.strings.outputs.build-output-dir }}/*.exe package
+        cp ${{ steps.strings.outputs.build-output-dir }}/*.pk3 package
+        cp ${FMOD_LIBRARY} package
 
     - name: Upload artefacts
       uses: actions/upload-artifact@v4
       with:
         path: package
-        name: ${{ matrix.os }} ${{ matrix.build_type }} ${{ matrix.serveronly }}
+        name: ${{ matrix.os }} ${{ matrix.platform }} ${{ matrix.build_type }}
