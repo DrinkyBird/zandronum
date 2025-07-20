@@ -44,7 +44,7 @@ jobs:
         $bits = 32;
         $sslArch = 'x86';
         $fmodArch = '';
-        If ( '{{ matrix.platform }}' -eq 'x64' ) {
+        If ( '${{ matrix.platform }}' -eq 'x64' ) {
             $bits = 64;
             $sslArch = 'x64';
             $fmodArch = '64';
