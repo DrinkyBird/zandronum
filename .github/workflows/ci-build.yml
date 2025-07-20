@@ -18,12 +18,14 @@ jobs:
         build_type: [Release]
         serveronly: ["OFF", "ON"]
         include:
+          - os: windows-latest
           - os: ubuntu-latest
           - os: ubuntu-24.04-arm
         exclude:
           - os: ubuntu-24.04-arm
             serveronly: "OFF"
           - os: windows-latest
+            serveronly: "OFF"
 
     steps:
     - uses: actions/checkout@v4
@@ -34,6 +36,14 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install dependencies for Windows
+      shell: pwsh
+      if: runner.os == 'Windows'
+      run: |
+        Invoke-WebRequest -Outfile 'deps.zip' 'https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/zan-windows-deps.zip'
+        Expand-Archive 'deps.zip' -DestinationPath 'deps'
+        echo "DXSDK_DIR=${PWD}/deps/dxsdk" >> $env:GITHUB_ENV
 
     - name: Install dependencies for Linux
       shell: bash
