@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 env:
   FMOD_VER: 44464
-  FMOD_SOVER: 4.44.64
 
 jobs:
   build:
@@ -50,7 +49,7 @@ jobs:
         $env:DXSDK_DIR = "${env:DEPS_DIR}\dxsdk" ;
         
         # We need it for the artefacts later
-        echo "FMOD_DLL=${env:DEPS_DIR}\fmodapi44464win\api\fmodex${fmodArch}.dll" >> $env:GITHUB_ENV ;
+        echo "FMOD_DLL=${env:DEPS_DIR}\fmod\api\fmodex${fmodArch}.dll" >> $env:GITHUB_ENV ;
         
         & cmake -B "${{ steps.strings.outputs.build-output-dir }}" -S "${{ github.workspace }}" `
             -A "${{ matrix.platform }}" `
@@ -63,8 +62,8 @@ jobs:
             -DLIB_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libcrypto_static.lib" `
             -DSSL_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libssl_static.lib" `
             -DSSL_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libssl_static.lib" `
-            -DFMOD_INCLUDE_DIR="${env:DEPS_DIR}\fmodapi44464win\api\inc" `
-            -DFMOD_LIBRARY="${env:DEPS_DIR}\fmodapi44464win\api\lib\fmodex${fmodArch}_vc.lib" `
+            -DFMOD_INCLUDE_DIR="${env:DEPS_DIR}\fmod\api\inc" `
+            -DFMOD_LIBRARY="${env:DEPS_DIR}\fmod\api\lib\fmodex${fmodArch}_vc.lib" `
             -DNASM_PATH="${env:DEPS_DIR}\nasm\nasm.exe"
 
     - name: Build
