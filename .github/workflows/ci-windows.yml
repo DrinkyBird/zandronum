@@ -50,19 +50,6 @@ jobs:
             $fmodArch = '64';
         }
         
-        echo    -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}" `
-            -DDXSDK_DIR="${env:DEPS_DIR}\dxsdk" `
-            -DOPUS_INCLUDE_DIR="${env:DEPS_DIR}\opus\include" `
-            -DOPUS_LIBRARIES="${env:DEPS_DIR}\opus\lib${bits}\opus.lib" `
-            -DOPENSSL_INCLUDE_DIR="${env:DEPS_DIR}\openssl${bits}\include" `
-            -DLIB_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libcrypto_static.lib" `
-            -DLIB_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libcrypto_static.lib" `
-            -DSSL_EAY_DEBUG="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MTd\libssl_static.lib" `
-            -DSSL_EAY_RELEASE="${env:DEPS_DIR}\openssl${bits}\lib\VC\${sslArch}\MT\libssl_static.lib" `
-            -DFMOD_INCLUDE_DIR="${env:DEPS_DIR}\fmodapi44464win\api\inc" `
-            -DFMOD_LIBRARY="${env:DEPS_DIR}\fmodapi44464win\api\lib\fmodex${fmodArch}_vc.lib" `
-            -DNASM_PATH="${env:DEPS_DIR}\nasm\nasm.exe" ;
-        
         $env:DXSDK_DIR = "${env:DEPS_DIR}\dxsdk" ;
         
         & cmake -B "${{ steps.strings.outputs.build-output-dir }}" -S "${{ github.workspace }}" `
