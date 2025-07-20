@@ -52,6 +52,9 @@ jobs:
         
         $env:DXSDK_DIR = "${env:DEPS_DIR}\dxsdk" ;
         
+        # We need it for the artefacts later
+        echo "FMOD_LIBRARY=${env:DEPS_DIR}\fmodapi44464win\api\lib\fmodex${fmodArch}_vc.lib" >> $env:GITHUB_ENV ;
+        
         & cmake -B "${{ steps.strings.outputs.build-output-dir }}" -S "${{ github.workspace }}" `
             -A "${{ matrix.platform }}" `
             -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}" `
@@ -70,12 +73,12 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - name: Create package
-      shell: bash
+      shell: pwsh
       run: |
         mkdir package
-        cp ${{ steps.strings.outputs.build-output-dir }}/*.exe package
-        cp ${{ steps.strings.outputs.build-output-dir }}/*.pk3 package
-        cp ${FMOD_LIBRARY} package
+        cp ${{ steps.strings.outputs.build-output-dir }}\*.exe package
+        cp ${{ steps.strings.outputs.build-output-dir }}\*.pk3 package
+        cp ${env:FMOD_LIBRARY} package
 
     - name: Upload artefacts
       uses: actions/upload-artifact@v4
