@@ -22,7 +22,7 @@ jobs:
           - os: ubuntu-24.04-arm
         exclude:
           - os: ubuntu-24.04-arm
-            serveronly: "SERVERONLY"
+            serveronly: ""
 
     steps:
     - uses: actions/checkout@v4
