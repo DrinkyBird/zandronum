@@ -55,6 +55,7 @@ jobs:
         & cmake -B "${{ steps.strings.outputs.build-output-dir }}" -S "${{ github.workspace }}" `
             -A "${{ matrix.platform }}" `
             -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}" `
+            -DRELEASE_WITH_DEBUG_FILE=ON `
             -DOPUS_INCLUDE_DIR="${env:DEPS_DIR}\opus\include" `
             -DOPUS_LIBRARIES="${env:DEPS_DIR}\opus\lib${bits}\opus.lib" `
             -DOPENSSL_INCLUDE_DIR="${env:DEPS_DIR}\openssl${bits}\include" `
