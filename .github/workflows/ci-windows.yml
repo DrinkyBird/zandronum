@@ -8,17 +8,14 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
 
       matrix:
-        os: [windows-latest]
         build_type: [Release]
         platform: ["Win32", "x64"]
-        include:
-          - os: windows-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -84,4 +81,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: package
-        name: ${{ matrix.os }} ${{ matrix.platform }} ${{ matrix.build_type }}
+        name: ${{ matrix.platform }} ${{ matrix.build_type }}
