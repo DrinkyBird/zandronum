@@ -14,15 +14,15 @@ jobs:
       fail-fast: false
 
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         build_type: [Release]
-        serveronly: ["OFF", "ON"]
+        serveronly: ["", "SERVERONLY"]
         include:
           - os: ubuntu-latest
           - os: ubuntu-24.04-arm
         exclude:
           - os: ubuntu-24.04-arm
-            serveronly: "OFF"
+            serveronly: "SERVERONLY"
 
     steps:
     - uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install g++ make cmake libsdl1.2-dev mercurial zlib1g-dev libbz2-dev libjpeg-dev libfluidsynth-dev libgtk2.0-dev timidity nasm libgl1-mesa-dev libssl-dev tar libglew-dev wget libopus-dev
-        if [[ "${{ matrix.serveronly }}" == "OFF" ]]; then
+        if [[ "${{ matrix.serveronly }}" == "" ]]; then
           wget https://github.com/DrinkyBird/zan-ci-deps/releases/download/ci-dependencies/fmodapi${FMOD_VER}linux.tar.gz
           tar xf fmodapi${FMOD_VER}linux.tar.gz
           echo "FMOD_INCLUDE_DIR=${PWD}/fmodapi${FMOD_VER}linux/api/inc" >> $GITHUB_ENV
@@ -49,8 +49,10 @@ jobs:
 
     - name: Configure CMake
       run: >
+        if [[ "${{ matrix.serveronly }}" == "" ]]; then export SERVERONLY=ON; fi
+        
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSERVERONLY=${{ matrix.serveronly }} -DRELEASE_WITH_DEBUG_FILE=ON
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSERVERONLY=${SERVERONLY} -DRELEASE_WITH_DEBUG_FILE=ON
         -S ${{ github.workspace }}
 
     - name: Build
